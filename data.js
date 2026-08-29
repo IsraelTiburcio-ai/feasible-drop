@@ -57,8 +57,9 @@ const MODELS = {
 };
 
 /* Tipos de ronda:
-   "sino"  → un punto cae en dron; el jugador decide SÍ / NO pertenece
-   "toca"  → tres puntos en escena; tocar el que se pide
+   "sino"          → decidir si un punto pertenece
+   "toca"          → tocar el punto que se pide
+   "restriccion"   → identificar qué restricción falla
    En "toca", find: "intruder" (el que NO pertenece) | "member" (el que SÍ) */
 
 const ROUNDS = [
@@ -105,33 +106,35 @@ const ROUNDS = [
     note: "50 ≤ 50 justo: los puntos del borde TAMBIÉN pertenecen a la región factible."
   },
   {
-    type: "sino",
+    type: "restriccion",
     model: "m1",
-    point: { name: "P", xy: [50, 0] },
+    point: { name: "P", xy: [39, 3] },
     belongs: false,
+    options: ["R1", "R2", "Ninguna"],
+    correctRestriction: "R1",
     checks: [
-      { txt: "R1: 2(50) + 0 = 100 > 80", ok: false },
-      { txt: "R2: 50 + 0 = 50 ≤ 50", ok: true },
+      { txt: "R1: 2(39) + 3 = 81 > 80", ok: false },
+      { txt: "R2: 39 + 3 = 42 ≤ 50", ok: true },
       { txt: "x, y ≥ 0", ok: true }
     ],
-    note: "Cumple R2, pero basta fallar UNA restricción para quedar fuera."
+    note: "Solo falla R1, por una unidad. Basta fallar UNA restricción para quedar fuera."
   },
   {
     type: "toca",
     find: "member",
     model: "m2",
     points: [
-      { name: "A", xy: [0, 4], belongs: true },
+      { name: "A", xy: [2.8, 3.6], belongs: true },
       { name: "B", xy: [4, 3], belongs: false },
-      { name: "C", xy: [1, 2], belongs: false }
+      { name: "C", xy: [1, 2.9], belongs: false }
     ],
     correctName: "A",
     checks: [
-      { txt: "A(0,4): R1 = −8 ≤ 4 ✓ · R2 = 16 ≤ 20 ✓ · y = 4 ≥ 3 ✓", ok: true },
+      { txt: "A(2.8,3.6): R1 = 4 ≤ 4 ✓ · R2 = 20 ≤ 20 ✓ · y = 3.6 ≥ 3 ✓", ok: true },
       { txt: "B(4,3): R1 = 10 > 4 ✗", ok: false },
-      { txt: "C(1,2): y = 2 < 3 ✗", ok: false }
+      { txt: "C(1,2.9): y = 2.9 < 3 ✗", ok: false }
     ],
-    note: "La región factible es la INTERSECCIÓN de todas las restricciones."
+    note: "A(2.8,3.6) está en un punto extremo: cumple la INTERSECCIÓN de todas las restricciones."
   },
   {
     type: "sino",
@@ -148,6 +151,7 @@ const ROUNDS = [
   }
 ];
 
-const ROUND_TIME = 12; // segundos por ronda
+const ROUND_TIME = 10; // segundos por ronda: modo de precisión
 const BASE_POINTS = 100;
 const MAX_BONUS = 50;
+const MAX_STREAK_BONUS = 30;

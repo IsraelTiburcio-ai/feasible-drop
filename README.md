@@ -7,14 +7,15 @@ Microjuego educativo mobile-first para practicar la **región factible** y la pe
 - **Repositorio:** https://github.com/IsraelTiburcio-ai/feasible-drop
 - **Versión pública:** https://IsraelTiburcio-ai.github.io/feasible-drop/
 
-La partida tiene 6 rondas y normalmente dura entre 45 y 90 segundos.
+La partida tiene 6 rondas y normalmente dura entre 35 y 75 segundos. El modo de precisión permite 10 segundos por ronda.
 
 ## Cómo se juega
 
 1. Observa el plano cartesiano y el área de intersección sombreada.
 2. En unas rondas decide si el punto **sí pertenece** o **no pertenece**.
 3. En otras, toca el punto que pertenece o el intruso que queda fuera.
-4. Revisa la sustitución en cada restricción después de responder.
+4. Detecta qué restricción falla cuando el punto está cerca de una frontera.
+5. Revisa la sustitución en cada restricción después de responder.
 
 Las líneas, puntos y botones tienen objetivos táctiles amplios. También se puede navegar con teclado. El juego incluye sonido breve, control de silencio y respeta `prefers-reduced-motion`.
 
@@ -37,6 +38,7 @@ El contenido se construyó a partir de las páginas 41-43 del PDF `Gimnasio 2. M
 
 - Verificación de los puntos del material: `(40,60)` no pertenece; `(30,10)` y `(20,30)` pertenecen.
 - Segundo modelo de la página 43, usado en una ronda adicional, con `y >= 3` y su región factible sombreada.
+- Puntos cercanos a la frontera y una ronda de identificación de `R1`, `R2` o ninguna restricción para aumentar la dificultad sin sobrecargar el plano.
 
 ## Tecnología
 

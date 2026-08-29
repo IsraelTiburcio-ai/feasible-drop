@@ -757,6 +757,17 @@ button:focus-visible,
   padding-inline: 0.2rem;
 }
 
+.answers.restriction-answers {
+  gap: 0.45rem;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.answer-btn.restriction-btn {
+  min-height: 3.9rem;
+  padding-inline: 0.2rem;
+  font-size: 0.76rem;
+}
+
 .tap-hint {
   grid-column: 1 / -1;
   align-self: center;

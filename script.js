@@ -15,6 +15,7 @@
     roundIndex: 0,
     score: 0,
     correct: 0,
+    streak: 0,
     gameStartedAt: 0,
     roundEndsAt: 0,
     timerFrame: 0,
@@ -73,6 +74,15 @@
 
   function setText(node, value) {
     node.textContent = value;
+  }
+
+  function shuffled(items) {
+    const copy = items.slice();
+    for (let index = copy.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(Math.random() * (index + 1));
+      [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
+    }
+    return copy;
   }
 
   function updateSoundControls() {
@@ -396,10 +406,10 @@
     svg.appendChild(plotContent);
 
     const pointLayer = svgElement("g", { class: "point-layer" });
-    if (round.type === "sino") {
+    if (round.type !== "toca") {
       appendSinglePoint(pointLayer, round.point, mapper, model);
     } else {
-      round.points.forEach((point, index) => appendCandidatePoint(pointLayer, point, mapper, model, handleTocaAnswer, index));
+      shuffled(round.points).forEach((point, index) => appendCandidatePoint(pointLayer, point, mapper, model, handleTocaAnswer, index));
     }
     svg.appendChild(pointLayer);
     return svg;
@@ -429,6 +439,9 @@
       accent.className = "prompt-accent";
       accent.textContent = `(${round.point.xy[0]}, ${round.point.xy[1]})`;
       prompt.append(accent, " pertenece a la región factible?");
+    } else if (round.type === "restriccion") {
+      prompt.textContent = `¿Qué restricción falla en (${round.point.xy[0]}, ${round.point.xy[1]})?`;
+      prompt.classList.add("prompt-accent");
     } else {
       prompt.textContent = round.find === "member"
         ? "TOCA el punto que SÍ pertenece"
@@ -462,6 +475,20 @@
         handleSinoAnswer(false);
       });
       elements.answers.append(yes, no);
+    } else if (round.type === "restriccion") {
+      elements.answers.className = "answers restriction-answers";
+      shuffled(round.options).forEach((option) => {
+        const button = document.createElement("button");
+        button.className = "answer-btn restriction-btn";
+        button.type = "button";
+        button.textContent = option === "Ninguna" ? "NINGUNA" : `${option} FALLA`;
+        button.setAttribute("aria-label", option === "Ninguna" ? "Ninguna restricción falla" : `${option} falla`);
+        button.addEventListener("click", () => {
+          sounds.tap();
+          handleRestrictionAnswer(option);
+        });
+        elements.answers.appendChild(button);
+      });
     } else {
       elements.answers.className = "answers toca-answers";
       const hint = document.createElement("div");
@@ -516,6 +543,10 @@
     answerRound(answer, false);
   }
 
+  function handleRestrictionAnswer(answer) {
+    answerRound(answer, false);
+  }
+
   function handleTocaAnswer(name) {
     const round = ROUNDS[state.roundIndex];
     const target = round.points.find((point) => point.name === name);
@@ -534,7 +565,7 @@
   }
 
   function revealPointClasses(round, selection) {
-    if (round.type === "sino") {
+    if (round.type !== "toca") {
       const pointGroup = elements.stage.querySelector(".single-point");
       if (!pointGroup) return;
       const drone = pointGroup.querySelector(".drone-group");
@@ -568,6 +599,10 @@
       if (isCorrect) return round.belongs ? "¡SÍ pertenece!" : "¡NO pertenece!";
       return round.belongs ? "La respuesta era SÍ pertenece" : "La respuesta era NO pertenece";
     }
+    if (round.type === "restriccion") {
+      if (isCorrect) return `¡${round.correctRestriction} detectada!`;
+      return `Era ${round.correctRestriction}: esa es la que falla`;
+    }
     if (isCorrect) return round.find === "member" ? "¡Aterrizaje exitoso!" : "¡Intruso detectado!";
     return round.find === "member" ? `Era ${round.correctName}: SÍ pertenece` : `Era ${round.correctName}: NO pertenece`;
   }
@@ -593,7 +628,8 @@
     if (!isCorrect) elements.feedback.classList.add("is-wrong");
     elements.fbIcon.textContent = isCorrect ? "✓" : "✕";
     elements.fbVerdict.textContent = buildVerdict(round, selection, isCorrect, timedOut);
-    elements.fbPoints.textContent = pointsEarned > 0 ? `+${pointsEarned}` : "sin puntos";
+    const streakLabel = isCorrect && state.streak >= 2 ? ` · racha x${state.streak}` : "";
+    elements.fbPoints.textContent = pointsEarned > 0 ? `+${pointsEarned}${streakLabel}` : "sin puntos";
     renderChecks(round.checks);
     elements.fbNote.textContent = round.note;
   }
@@ -607,20 +643,30 @@
 
     const isCorrect = round.type === "sino"
       ? selection !== null && selection === round.belongs
-      : selection !== null && selection === round.correctName;
+      : round.type === "restriccion"
+        ? selection !== null && selection === round.correctRestriction
+        : selection !== null && selection === round.correctName;
     const remaining = getRemainingSeconds();
-    const pointsEarned = isCorrect ? BASE_POINTS + Math.round((remaining / ROUND_TIME) * MAX_BONUS) : 0;
+    let pointsEarned = 0;
     if (isCorrect) {
       state.correct += 1;
+      state.streak += 1;
+      const streakBonus = Math.min(MAX_STREAK_BONUS, Math.max(0, state.streak - 1) * 10);
+      pointsEarned = BASE_POINTS + Math.round((remaining / ROUND_TIME) * MAX_BONUS) + streakBonus;
       state.score += pointsEarned;
       sounds.correct();
     } else {
+      state.streak = 0;
       sounds.wrong();
     }
     updateScore();
     revealPointClasses(round, selection);
     showFeedback(round, selection, isCorrect, pointsEarned, timedOut);
 
+    scheduleNextRound(isCorrect);
+  }
+
+  function scheduleNextRound(isCorrect) {
     const wait = isCorrect ? 2100 : 3000;
     state.nextRoundTimer = window.setTimeout(() => {
       elements.feedback.hidden = true;
@@ -662,6 +708,7 @@
     state.roundIndex = 0;
     state.score = 0;
     state.correct = 0;
+    state.streak = 0;
     state.gameStartedAt = performance.now();
     updateScore();
     ensureAudio();
