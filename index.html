@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <meta name="description" content="FEASIBLE DROP — Microjuego del Gimnasio 2: aterriza en la región factible. Método gráfico de Programación Lineal." />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <title>FEASIBLE DROP · Aterriza en la región factible</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main id="app">
+
+    <!-- ============ PORTADA ============ -->
+    <section id="screen-cover" class="screen active" aria-label="Portada">
+      <div class="cover-art" aria-hidden="true">
+        <svg viewBox="0 0 300 220" class="cover-svg">
+          <polygon points="30,190 250,190 160,90 30,60" class="cover-region" />
+          <line x1="0" y1="150" x2="300" y2="30" class="cover-line" />
+          <line x1="0" y1="105" x2="300" y2="45" class="cover-line l2" />
+          <g class="cover-drone">
+            <line x1="150" y1="10" x2="150" y2="86" class="drop-line" />
+            <g transform="translate(150,96)">
+              <circle r="13" class="pt-core" />
+              <g class="drone-body">
+                <rect x="-11" y="-20" width="22" height="10" rx="5" />
+                <circle cx="-13" cy="-18" r="4" />
+                <circle cx="13" cy="-18" r="4" />
+              </g>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <h1 class="title">FEASIBLE<span class="title-accent">DROP</span></h1>
+      <p class="subtitle">Aterriza en la región factible</p>
+      <p class="cover-tag">Gimnasio 2 · Método Gráfico</p>
+      <ul class="cover-rules" aria-label="Cómo jugar">
+        <li><span class="rule-ico" aria-hidden="true">🛸</span> Observa la región factible sombreada</li>
+        <li><span class="rule-ico" aria-hidden="true">📍</span> Decide si el punto pertenece… o toca al intruso</li>
+        <li><span class="rule-ico" aria-hidden="true">⚡</span> 6 rondas · menos de 2 minutos</li>
+      </ul>
+      <button id="btn-play" class="btn btn-primary btn-big">▶ JUGAR</button>
+      <button id="btn-mute-cover" class="btn-ghost-small" aria-pressed="false" aria-label="Activar sonido">🔇 Sonido</button>
+    </section>
+
+    <!-- ============ JUEGO ============ -->
+    <section id="screen-game" class="screen" aria-label="Juego">
+      <header class="hud">
+        <div id="hud-dots" class="dots" aria-label="Progreso de rondas"></div>
+        <div class="hud-right">
+          <span id="hud-score" class="score" aria-live="off">0</span>
+          <button id="btn-mute" class="icon-btn" aria-pressed="false" aria-label="Activar sonido">🔇</button>
+        </div>
+      </header>
+
+      <div class="timer-track" aria-hidden="true"><div id="timer-fill" class="timer-fill"></div></div>
+
+      <div id="model-chip" class="model-chip" aria-live="polite"></div>
+
+      <div id="stage" class="stage"></div>
+
+      <div id="prompt" class="prompt" aria-live="polite"></div>
+
+      <div id="answers" class="answers"></div>
+    </section>
+
+    <!-- ============ RESULTADOS ============ -->
+    <section id="screen-results" class="screen" aria-label="Resultados">
+      <div class="results-card">
+        <p class="results-kicker">Misión cumplida</p>
+        <div id="stars" class="stars" aria-hidden="true"></div>
+        <h2 id="results-title" class="results-title">¡Aterrizaje perfecto!</h2>
+        <div class="results-grid">
+          <div class="stat"><span id="res-score" class="stat-val">0</span><span class="stat-lbl">puntos</span></div>
+          <div class="stat"><span id="res-acc" class="stat-val">0%</span><span class="stat-lbl">aciertos</span></div>
+          <div class="stat"><span id="res-time" class="stat-val">0s</span><span class="stat-lbl">tiempo</span></div>
+        </div>
+        <div class="recap">
+          <p class="recap-def"><strong>Región factible:</strong> conjunto de soluciones que satisfacen todas las restricciones, explícitas e implícitas.</p>
+          <p class="recap-tip">💡 En los <em>puntos extremos</em> se encuentra la solución óptima.</p>
+        </div>
+        <button id="btn-again" class="btn btn-primary btn-big">↺ JUGAR OTRA VEZ</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Feedback flotante -->
+  <div id="feedback" class="feedback" role="status" aria-live="polite" hidden>
+    <div class="feedback-head">
+      <span id="fb-ico" class="fb-ico" aria-hidden="true">✓</span>
+      <span id="fb-verdict" class="fb-verdict">SÍ pertenece</span>
+      <span id="fb-points" class="fb-points">+120</span>
+    </div>
+    <div id="fb-checks" class="fb-checks"></div>
+    <div id="fb-note" class="fb-note"></div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
