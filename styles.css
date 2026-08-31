@@ -977,6 +977,11 @@ button:focus-visible,
   color: var(--c-teal-hi);
 }
 
+.recap-clarify {
+  margin-top: 0.45rem !important;
+  color: #f1d18a;
+}
+
 /* Motion */
 @keyframes coverDrop {
   0%, 100% { transform: translateY(-4px); }

@@ -88,10 +88,10 @@ const ROUNDS = [
     correctName: "A",
     checks: [
       { txt: "A(40,60): R1 = 140 > 80 ✗", ok: false },
-      { txt: "B(30,10): R1 = 70 ≤ 80 ✓ · R2 = 40 ≤ 50 ✓", ok: true },
-      { txt: "C(20,30): R1 = 70 ≤ 80 ✓ · R2 = 50 ≤ 50 ✓", ok: true }
+      { txt: "B(30,10): R1 = 70 ≤ 80 ✓ · R2 = 40 ≤ 50 ✓ · interior", ok: true },
+      { txt: "C(20,30): R1 = 70 ≤ 80 ✓ · R2 = 50 ≤ 50 ✓ · borde, no vértice", ok: true }
     ],
-    note: "El intruso A(40,60) viola las dos restricciones: no pertenece."
+    note: "El intruso A(40,60) no pertenece. B y C sí pertenecen, pero ninguno es un punto extremo."
   },
   {
     type: "sino",
@@ -103,7 +103,7 @@ const ROUNDS = [
       { txt: "R2: 20 + 30 = 50 ≤ 50", ok: true },
       { txt: "x, y ≥ 0", ok: true }
     ],
-    note: "50 ≤ 50 justo: los puntos del borde TAMBIÉN pertenecen a la región factible."
+    note: "50 ≤ 50 justo: los puntos del borde TAMBIÉN pertenecen a la región factible. C no es un vértice: pertenecer no significa ser punto extremo."
   },
   {
     type: "restriccion",
@@ -146,7 +146,7 @@ const ROUNDS = [
       { txt: "R2: 30 + 20 = 50 ≤ 50", ok: true },
       { txt: "x, y ≥ 0", ok: true }
     ],
-    note: "Es el punto extremo A: ¡en los vértices vive la solución óptima!",
+    note: "Es el punto extremo A: ¡en los vértices vive la solución óptima! Recuerda: no todo punto factible es extremo.",
     star: true
   }
 ];
