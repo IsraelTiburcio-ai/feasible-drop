@@ -680,6 +680,7 @@
     }, wait);
   }
 
+  const resultsBridge = window.OptiLabResults ? window.OptiLabResults.create('feasible-drop') : { start() {}, complete() {}, cancel() {} };
   function finishGame() {
     window.clearTimeout(state.nextRoundTimer);
     cancelAnimationFrame(state.timerFrame);
@@ -701,9 +702,11 @@
     setText(elements.resultTime, formatTime(elapsed));
     showScreen("screen-results");
     sounds.finish();
+    resultsBridge.complete({ reason: 'completed', correct: state.correct, total: ROUNDS.length, durationMs: Math.max(0, Math.round(elapsed)), score: state.score });
   }
 
   function startGame() {
+    resultsBridge.start();
     window.clearTimeout(state.nextRoundTimer);
     state.roundIndex = 0;
     state.score = 0;
